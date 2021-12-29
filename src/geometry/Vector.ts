@@ -5,12 +5,43 @@ import { Common } from "../core/Common";
  * 2D 向量，代表位置，位移，方向
  */
 export default class Vector {
-    x: Decimal;
-    y: Decimal;
+    
+    private _x: Decimal;
+    public get x() {
+        return this._x;
+    }
+    public set x(_x: Decimal) {
+        // add 另类的深度copy
+        this._x = _x.add(Common.ZERO)
+    }
+
+    private _y: Decimal;
+    public get y() {
+        return this._y;
+    }
+    public set y(_y: Decimal) {
+        this._y = _y.add(Common.ZERO)
+    }
+
+    /**
+     * 不需要深度复制
+     */
+    public set xx(_x: Decimal) {
+        this._x = _x;
+    }
+
+    /**
+     * 不需要深度复制
+     */
+     public set yy(_y: Decimal) {
+        this._y = _y;
+    }
 
     constructor(x: Decimal, y: Decimal) {
         this.x = x;
         this.y = y;
+        this._x = this.x;
+        this._y = this.y;
     }
 
 
@@ -20,9 +51,7 @@ export default class Vector {
     }
 
     public static fromFixXY(x: Decimal, y: Decimal) {
-        const vec = this.create();
-        vec.x = x;
-        vec.y = y;
+        const vec = new Vector(x, y);
         return vec;
         
     }

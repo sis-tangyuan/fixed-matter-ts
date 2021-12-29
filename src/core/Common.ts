@@ -81,8 +81,8 @@ export class Common {
      * @param obj 
      * @returns 
      */
-    public static values(obj: any): string[] {
-        var values: string[] = []
+    public static values<T>(obj: any): T[] {
+        var values: T[] = []
 
         if (Object.keys) {
             var keys = Object.keys(obj)
