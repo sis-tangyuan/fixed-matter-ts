@@ -1,7 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Common = void 0;
+const decimal_js_1 = __importDefault(require("decimal.js"));
 class Common {
+    static get ZERO() { return new decimal_js_1.default(0); }
     /**
      * 将args参数添加到obj中
      * @param obj 被拓展的对象
@@ -36,6 +41,52 @@ class Common {
                 }
             }
         }
+    }
+    /**
+     * 深度克隆一个对象
+     * @param obj
+     * @param deep
+     * @returns 克隆结果
+     */
+    static clone(obj, deep) {
+        return Common.extend({}, deep, obj);
+    }
+    /**
+     * 返回对象的所有key
+     * @param obj
+     * @returns
+     */
+    static keys(obj) {
+        if (Object.keys) {
+            return Object.keys(obj);
+        }
+        let keys = [];
+        for (let key in obj) {
+            keys.push(key);
+        }
+        return keys;
+    }
+    /**
+     * 返回obj的所有值
+     * @param obj
+     * @returns
+     */
+    static values(obj) {
+        var values = [];
+        if (Object.keys) {
+            var keys = Object.keys(obj);
+            for (var i = 0; i < keys.length; i++) {
+                values.push(obj[keys[i]]);
+            }
+            return values;
+        }
+        for (var key in obj) {
+            values.push(obj[key]);
+        }
+        return values;
+    }
+    static nextId() {
+        return this._nextId++;
     }
 }
 exports.Common = Common;

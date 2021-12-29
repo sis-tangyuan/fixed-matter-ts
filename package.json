@@ -4,15 +4,15 @@
   "description": "A 2D game physical engine support fixed-float",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "jest",
+    "test-c": "jest --coverage"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sis-tangyuan/fixed-matter-ts.git"
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
   },
-  "keywords": [
-    "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"
-  ],
   "author": "LPC",
   "license": "ISC",
   "bugs": {
@@ -20,9 +20,15 @@
   },
   "homepage": "https://github.com/sis-tangyuan/fixed-matter-ts#readme",
   "devDependencies": {
+    "@babel/core": "^7.16.5",
+    "@babel/preset-env": "^7.16.5",
+    "@types/jest": "^27.0.3",
     "@types/node": "^17.0.5",
+    "babel-jest": "^27.4.5",
     "gulp": "^4.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
+    "jest": "^27.4.5",
+    "ts-jest": "^27.1.2",
     "tslint": "^6.1.3",
     "typescript": "^4.5.4"
   },

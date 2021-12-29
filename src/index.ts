@@ -1,4 +1,6 @@
+import Vector from "./geometry/Vector";
+import Vertices from "./geometry/Vertices";
 
-import "./core/Common"
 
-console.log("hello TypeScript")
+export {Vector, Vertices}
+

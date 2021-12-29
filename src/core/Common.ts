@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 
 export class Common {
     // 生成的id
@@ -10,6 +11,8 @@ export class Common {
     private static _warnedOnce = {}
 
     private static _decomp =null;
+
+    public static get ZERO() {return new Decimal(0);}
 
     /**
      * 将args参数添加到obj中
@@ -57,5 +60,47 @@ export class Common {
         return Common.extend({}, deep, obj);
     }
 
-    
+    /**
+     * 返回对象的所有key
+     * @param obj 
+     * @returns 
+     */
+    public static keys(obj: any): string[] {
+        if (Object.keys) {
+            return Object.keys(obj);
+        }
+        let keys: string[] = [];
+        for (let key in obj) {
+            keys.push(key);
+        }
+        return keys;
+    }
+
+    /**
+     * 返回obj的所有值
+     * @param obj 
+     * @returns 
+     */
+    public static values(obj: any): string[] {
+        var values: string[] = []
+
+        if (Object.keys) {
+            var keys = Object.keys(obj)
+            for (var i = 0; i < keys.length; i++) {
+                values.push(obj[keys[i]])
+            }
+            return values;
+        }
+
+        for (var key in obj) {
+            values.push(obj[key])
+        }
+        return values;
+    }
+
+
+    public static nextId() {
+        return this._nextId++;
+    }
+
 }
