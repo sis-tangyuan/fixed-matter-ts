@@ -1,0 +1,22 @@
+{
+  "name": "fixed-matter-ts",
+  "version": "1.0.0",
+  "description": "A 2D game physical engine support fixed-float",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sis-tangyuan/fixed-matter-ts.git"
+  },
+  "keywords": [
+    "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"
+  ],
+  "author": "LPC",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sis-tangyuan/fixed-matter-ts/issues"
+  },
+  "homepage": "https://github.com/sis-tangyuan/fixed-matter-ts#readme"
+}
