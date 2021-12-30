@@ -14,6 +14,7 @@ export class Common {
 
     public static get ZERO() {return new Decimal(0);}
 
+
     /**
      * 将args参数添加到obj中
      * @param obj 被拓展的对象
@@ -102,5 +103,6 @@ export class Common {
     public static nextId() {
         return this._nextId++;
     }
+
 
 }

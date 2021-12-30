@@ -1,6 +1,6 @@
 import Vector from "./geometry/Vector";
-import Vertices from "./geometry/Vertex";
+import Vertex from "./geometry/Vertex";
 
 
-export {Vector, Vertices}
+export {Vector, Vertex}
 

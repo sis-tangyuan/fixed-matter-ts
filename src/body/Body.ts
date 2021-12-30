@@ -1,7 +1,9 @@
 import Decimal from "decimal.js";
 import { Vector } from "..";
 import { Common } from "../core/Common";
+import { IEvent } from "../core/Events";
 import Vertex from "../geometry/Vertex";
+import Vertices from "../geometry/Vertices";
 
 
 // 外部可以设置的参数
@@ -21,7 +23,7 @@ export class CollisionFilter {
     }
 }
 
-export default class Body {
+export default class Body implements IEvent {
 
     // 惯性缩放值
     private static _inertiaScale = new Decimal(4)
@@ -29,6 +31,7 @@ export default class Body {
     private static _nextNonCollidingGroupId = -1;
     private static _nextCategory = 0x0001;
 
+    events?: Map<string, Function[]> | undefined;
 
     id: number;
 
@@ -87,6 +90,9 @@ export default class Body {
     // 总动量
     motion: Decimal;
 
+    // 随眠计数
+    sleepCounter: Decimal;
+
     // 睡眠阀值
     sleepThreshold: Decimal;
 
@@ -140,7 +146,7 @@ export default class Body {
         this.parts = [];
         this.angle = Common.ZERO;
         this.position = Vector.create();
-        this.vertices = Vertex.fromPath('L 0 0 L 40 0 L 40 40 L 0 40')
+        this.vertices = Vertices.fromPath('L 0 0 L 40 0 L 40 40 L 0 40')
         this.force = Vector.create();
         this.torque = Common.ZERO;
         this.positionImpulse = Vector.create();
@@ -153,6 +159,7 @@ export default class Body {
         this.isStatic = false;
         this.isSleeping = false;
         this.motion = Common.ZERO;
+        this.sleepCounter = Common.ZERO;
         this.sleepThreshold = new Decimal(60);
         this.density = new Decimal(0.001)
         this.restitution = Common.ZERO;

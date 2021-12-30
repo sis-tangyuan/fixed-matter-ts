@@ -169,7 +169,16 @@ export default class Vector {
      * @returns 
      */
     cross3(vector1: Vector, vector2: Vector): Decimal {
-        return (vector1.x.sub(this.x)).mul(vector2.y.sub(this.y)).sub(vector1.y.sub(this.y).mul(vector2.x.sub(this.x)))
+        // return (vector1.x.sub(this.x)).mul(vector2.y.sub(this.y)).sub(vector1.y.sub(this.y).mul(vector2.x.sub(this.x)))
+        const ab = Vector.fromFixXY(vector1.x.sub(this.x), vector1.y.sub(this.y))
+        const ac = Vector.fromFixXY(vector2.x.sub(this.x), vector2.y.sub(this.y))
+        return ab.cross(ac)
+    }
+
+    static cross33(vector: Vector, vector1: Vector, vector2: Vector): Decimal{
+        const ab = Vector.fromFixXY(vector1.x.sub(vector.x), vector1.y.sub(vector.y))
+        const ac = Vector.fromFixXY(vector2.x.sub(vector.x), vector2.y.sub(vector.y))
+        return ab.cross(ac)
     }
 
     /**
@@ -245,6 +254,15 @@ export default class Vector {
         const deltaX = vec.x.sub(this.x);
         const deltaY = vec.y.sub(this.y);
         return Decimal.atan2(deltaY, deltaX);
+    }
+
+    toString(): string {
+        return `x: ${this.x.toNumber()}, y: ${this.y.toNumber()}`
+    }
+
+    reset() {
+        this.x = Common.ZERO;
+        this.y = Common.ZERO;
     }
 
 }

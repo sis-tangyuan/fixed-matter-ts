@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { Vector, Vertices } from "..";
+import { Vector } from "..";
 import Body from "../body/Body";
 import { Common } from "../core/Common";
 
@@ -42,35 +42,8 @@ export default class Vertex {
         return vertices;
     }
 
-    public static fromPath(path: string, body?: Body): Vertex[] {
-        var pathPattern = /L?\s*([-\d.e]+)[\s,]*([-\d.e]+)*/ig,
-            points: Vector[] = [];
-
-        path.replace(pathPattern, (match: any, x: number, y: number) => {
-            // points.push({ x: parseFloat(x), y: parseFloat(y) });
-            points.push(new Vector(new Decimal(x), new Decimal(y)))
-            return ""
-        });
-        return Vertex.create(points, body);
+    get vector(): Vector {
+        return new Vector(this.x, this.y);
     }
 
-    /**
-     * 多边形面积
-     * @param vertices 顶点
-     * @param unsigned 是否无符号
-     */
-    public static area(vertices: Vertex[], unsigned: boolean = false): Decimal {
-        var area = Common.ZERO,
-        j = vertices.length - 1;
-        for (let i = 0; i < vertices.length; i++) {
-            const dx = vertices[j].x.sub(vertices[i].x)
-            const dy = vertices[j].y.add(vertices[i].y);
-            area = area.add(dx.mul(dy))
-            j = i;
-        }
-        if (unsigned) {
-            return area.div(new Decimal(2)).abs()
-        }
-        return area.div(new Decimal(2));
-    }
 }
