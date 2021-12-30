@@ -171,9 +171,12 @@ export default class Vertices {
     /**
      * 通过叉乘的方式判断point是否在多边形内部
      * 顶点按照逆时针排列
-     * 向量1: 顶点1-> 点  = 点 - 顶点1，
-     * 向量2: 顶点1->顶点2 = 顶点2 - 顶点1
-     * 向量1x向量2 都必须<=0这说明点再多边形里面
+     * 向量1: A -> P  =  P - A = AP
+     * 向量2: A -> B =   B - A = AB
+     * APxAB 都必须<=0,才说明点再多边形里面
+     * OPxOB < 0 表示 OB 在 OP 右边
+     *       > 0 表示左边
+     *       = 0 表示平行
      * 也就是说 所有向量1都是围绕顶点1顺时针旋转的或者不旋转
      * 参考: https://blog.csdn.net/theArcticOcean/article/details/48632391
      * @param vertices 
@@ -192,6 +195,8 @@ export default class Vertices {
             nextVertex = vertices[i];
             const v1 = new Vector(pointX.sub(vertex.x), pointY.sub(vertex.y));
             const v2 = new Vector(nextVertex.x.sub(vertex.x), nextVertex.y.sub(vertex.y))
+            const cross = v1.cross(v2)
+            // console.log(`点乘: ${i}, value: ${cross.toString()}`)
             if (v1.cross(v2).gt(zero)) {
                 return false;
             }
