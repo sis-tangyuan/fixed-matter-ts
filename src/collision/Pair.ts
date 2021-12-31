@@ -62,7 +62,7 @@ export default class Pair {
 
     update(collission: Collision, timestamp: Decimal) {
         var contacts = this.contacts,
-            support = collission.support,
+            supports = collission.supports,
             activeContacts = this.activeContacts,
             parentA = collission.parentA,
             parentB = collission.parentB,
@@ -71,7 +71,25 @@ export default class Pair {
         this.timeUpdateed = timestamp.add(Common.ZERO)
         this.collision = collission
         this.separation = collission.depth
-        // this.inverseMass = 
+        this.inverseMass = parentA.inverseMass.add(parentB.inverseMass)
+        this.friction = parentA.friction.lt(parentB.friction) ? parentA.friction : parentB.friction
+        this.frictionStatic = parentA.frictionStatic > parentB.frictionStatic ? parentA.frictionStatic : parentB.frictionStatic;
+        this.restitution = parentA.restitution > parentB.restitution ? parentA.restitution : parentB.restitution;
+        this.slop = parentA.slop > parentB.slop ? parentA.slop : parentB.slop;
+
+        collission.pair = this;
+        activeContacts.length = 0;
+
+        for(let i = 0; i < supports.length; i++) {
+            let support = supports[i],
+                contactId = support.body === parentA ? support.index : parentAVerticesLength + support.index,
+                contact = contacts[contactId]
+            if (contact) {
+                activeContacts.push(contact)
+            } else {
+                activeContacts.push(contacts[contactId] = new Contact(support))
+            }
+        }
     }
 
     setActive(isActive: boolean, timestamp: Decimal) {

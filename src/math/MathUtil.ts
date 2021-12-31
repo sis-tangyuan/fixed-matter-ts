@@ -1,6 +1,7 @@
 import Decimal from "decimal.js";
 
 export default class MathUtil {
+    public static readonly zero = new Decimal(0)
     public static readonly PI = new Decimal(3.14159265358)
     public static readonly HalfCircleAngle = new Decimal(180);
 

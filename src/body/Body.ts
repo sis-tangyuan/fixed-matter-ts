@@ -2,24 +2,25 @@ import Decimal from "decimal.js";
 import { Vector } from "..";
 import { Common } from "../core/Common";
 import { IEvent } from "../core/Events";
+import Bounds from "../geometry/Bounds";
 import Vertex from "../geometry/Vertex";
 import Vertices from "../geometry/Vertices";
 
 
 // 外部可以设置的参数
 export interface BodyOpt {
-
+    parent?: Body
 }
 
 export class CollisionFilter {
-    category: Decimal;
-    mask: Decimal;
-    group: Decimal;
+    category: number;
+    mask: number;
+    group: number;
 
     constructor() {
-        this.category = new Decimal(0x0001)
-        this.mask = new Decimal(0xffffffff)
-        this.group = Common.ZERO;
+        this.category = 0x0001;
+        this.mask = 0xffffffff;
+        this.group = 0;
     }
 }
 
@@ -126,7 +127,7 @@ export default class Body implements IEvent {
     // 上一帧 的角度
     anglePrev: Decimal
 
-    parent?: Body
+    parent: Body
 
     axes: Vector[]
 
@@ -136,8 +137,14 @@ export default class Body implements IEvent {
     // 质量
     mass: Decimal
 
+    // 质量的逆
+    inverseMass: Decimal
+
     // 惯性
     inertia: Decimal
+
+    // AABB
+    bounds: Bounds;
 
     constructor(option?: BodyOpt) {
         this.id = Common.nextId();
@@ -147,6 +154,7 @@ export default class Body implements IEvent {
         this.angle = Common.ZERO;
         this.position = Vector.create();
         this.vertices = Vertices.fromPath('L 0 0 L 40 0 L 40 40 L 0 40')
+        this.bounds = Bounds.create(this.vertices)
         this.force = Vector.create();
         this.torque = Common.ZERO;
         this.positionImpulse = Vector.create();
@@ -174,7 +182,9 @@ export default class Body implements IEvent {
         this.axes = [];
         this.area = Common.ZERO;
         this.mass = Common.ZERO;
+        this.inverseMass = Common.ZERO;
         this.inertia = Common.ZERO;
+        this.parent = option?.parent || this
     }
 
     static nextGroup(isNonCollding: boolean): number {

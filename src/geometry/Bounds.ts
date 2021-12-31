@@ -82,6 +82,15 @@ export default class Bounds {
     }
 
     /**
+     * 不相交
+     * @param bounds 
+     */
+    unOverlaps(bounds: Bounds): boolean {
+        return this.min.x.gt(bounds.max.x) || this.max.x.lt(bounds.min.x)
+            || this.max.y.lt(bounds.min.y) || this.min.y.gt(bounds.max.y)
+    }
+
+    /**
      * 位置转换
      * @param vector 
      */
