@@ -33,14 +33,7 @@ export default class Vertex {
         return new Vertex(new Decimal(x), new Decimal(y))
     }
 
-    public static create(points: Vector[], body?: Body): Vertex[] {
-        const vertices: Vertex[] = [];
-        for(let index = 0; index < points.length; index++) {
-            const point = points[index];
-            vertices.push(new Vertex(point.x, point.y, body, index, false))
-        }
-        return vertices;
-    }
+
 
     get vector(): Vector {
         return new Vector(this.x, this.y);
