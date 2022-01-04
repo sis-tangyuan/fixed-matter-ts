@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import { Common } from "../core/Common";
+import MathUtil from "../math/MathUtil";
 
 /**
  * 2D 向量，代表位置，位移，方向
@@ -11,7 +12,7 @@ export default class Vector {
   }
   public set x(_x: Decimal) {
     // add 另类的深度copy
-    this._x = _x.add(Common.ZERO);
+    this._x = _x.add(MathUtil.ZERO);
   }
 
   private _y: Decimal;
@@ -19,7 +20,7 @@ export default class Vector {
     return this._y;
   }
   public set y(_y: Decimal) {
-    this._y = _y.add(Common.ZERO);
+    this._y = _y.add(MathUtil.ZERO);
   }
 
   /**
@@ -44,7 +45,7 @@ export default class Vector {
   }
 
   public static create(x?: Decimal, y?: Decimal) {
-    return new Vector(x || Common.ZERO, y || Common.ZERO);
+    return new Vector(x || MathUtil.ZERO, y || MathUtil.ZERO);
   }
 
   public static fromFixXY(x: Decimal, y: Decimal) {
@@ -67,6 +68,11 @@ export default class Vector {
     // const y = new Decimal(vector.y.toNumber());
     // return new Vector(x, y);
     return Vector.create(vector.x, vector.y);
+  }
+
+  copy(vector: Vector) {
+    this.x = vector.x;
+    this.y = vector.y;
   }
 
   /**
@@ -134,7 +140,7 @@ export default class Vector {
    */
   normalise(): Vector {
     const length = this.magnitude();
-    if (length.eq(Common.ZERO)) {
+    if (length.eq(MathUtil.ZERO)) {
       return Vector.create();
     }
     return Vector.fromFixXY(this.x.div(length), this.y.div(length));
@@ -264,7 +270,7 @@ export default class Vector {
   }
 
   reset() {
-    this.x = Common.ZERO;
-    this.y = Common.ZERO;
+    this.x = MathUtil.ZERO;
+    this.y = MathUtil.ZERO;
   }
 }

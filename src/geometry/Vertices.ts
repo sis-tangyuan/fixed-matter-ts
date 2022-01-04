@@ -2,6 +2,7 @@ import Decimal from "decimal.js";
 import { Vector } from "..";
 import Body from "../body/Body";
 import { Common } from "../core/Common";
+import MathUtil from "../math/MathUtil";
 import Vertex from "./Vertex";
 
 export default class Vertices {
@@ -34,7 +35,7 @@ export default class Vertices {
     vertices: Vertex[] | Vector[],
     unsigned: boolean = false
   ): Decimal {
-    var area = Common.ZERO,
+    var area = MathUtil.ZERO,
       j = vertices.length - 1;
     for (let i = 0; i < vertices.length; i++) {
       const dx = vertices[j].x.sub(vertices[i].x);
@@ -55,7 +56,7 @@ export default class Vertices {
    * @returns
    */
   public static area2(vertices: Vertex[], unsigned: boolean = false): Decimal {
-    var area = Common.ZERO,
+    var area = MathUtil.ZERO,
       j = vertices.length - 1;
     for (let i = 0; i < vertices.length; i++) {
       const dx = vertices[j].x.mul(vertices[i].y);
@@ -110,8 +111,8 @@ export default class Vertices {
    * @param mass
    */
   public static inertia(vertices: Vertex[], mass: Decimal): Decimal {
-    var numerator = Common.ZERO,
-      denominator = Common.ZERO,
+    var numerator = MathUtil.ZERO,
+      denominator = MathUtil.ZERO,
       v = vertices,
       cross,
       j;
@@ -164,7 +165,7 @@ export default class Vertices {
     angle: Decimal,
     point: Vector
   ): Vertex[] {
-    if (angle.eq(Common.ZERO)) return vertices;
+    if (angle.eq(MathUtil.ZERO)) return vertices;
 
     let cos = angle.cos(),
       sin = angle.sin(),
@@ -206,7 +207,7 @@ export default class Vertices {
       nextVertex;
     let vertex: Vertex = vertices[verticesLength - 1];
 
-    let zero = Common.ZERO;
+    let zero = MathUtil.ZERO;
 
     for (let i = 0; i < verticesLength; i++) {
       nextVertex = vertices[i];
@@ -281,7 +282,7 @@ export default class Vertices {
   public static isConvex(vertices: Vertex[]): boolean {
     var flag = 0,
       n = vertices.length,
-      zero = Common.ZERO,
+      zero = MathUtil.ZERO,
       i,
       j,
       k,
@@ -313,7 +314,7 @@ export default class Vertices {
   public static hull(vertices: Vertex[]): Vertex[] {
     var upper: Vertex[] = [],
       lower: Vertex[] = [],
-      zero = Common.ZERO,
+      zero = MathUtil.ZERO,
       vertex,
       i;
     vertices = vertices.slice(0);

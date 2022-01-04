@@ -1,6 +1,7 @@
 import Decimal from "decimal.js";
 import Body from "../body/Body";
 import { Common } from "../core/Common";
+import MathUtil from "../math/MathUtil";
 import Collision from "./Collision";
 import Contact from "./Contact";
 
@@ -32,17 +33,17 @@ export default class Pair {
         this.collision = collision;
         this.contacts = [];
         this.activeContacts = [];
-        this.separation = Common.ZERO;
+        this.separation = MathUtil.ZERO;
         this.isActive = true;
         this.confirmedActive = true;
         this.isSensor = bodyA.isSensor || bodyB.isSensor;
-        this.timeCreated = timestamp.add(Common.ZERO);
-        this.timeUpdateed = timestamp.add(Common.ZERO)
-        this.inverseMass = Common.ZERO;
-        this.friction = Common.ZERO;
-        this.frictionStatic = Common.ZERO;
-        this.restitution = Common.ZERO;
-        this.slop = Common.ZERO;
+        this.timeCreated = timestamp.add(MathUtil.ZERO);
+        this.timeUpdateed = timestamp.add(MathUtil.ZERO)
+        this.inverseMass = MathUtil.ZERO;
+        this.friction = MathUtil.ZERO;
+        this.frictionStatic = MathUtil.ZERO;
+        this.restitution = MathUtil.ZERO;
+        this.slop = MathUtil.ZERO;
     }
 
     static create(collission: Collision, timestamp: Decimal): Pair {
@@ -68,7 +69,7 @@ export default class Pair {
             parentB = collission.parentB,
             parentAVerticesLength = parentA?.vertices.length
         this.isActive = true
-        this.timeUpdateed = timestamp.add(Common.ZERO)
+        this.timeUpdateed = timestamp.add(MathUtil.ZERO)
         this.collision = collission
         this.separation = collission.depth
         this.inverseMass = parentA.inverseMass.add(parentB.inverseMass)
@@ -95,7 +96,7 @@ export default class Pair {
     setActive(isActive: boolean, timestamp: Decimal) {
         if (isActive) {
             this.isActive = true;
-            this.timeUpdateed = timestamp.add(Common.ZERO)
+            this.timeUpdateed = timestamp.add(MathUtil.ZERO)
         } else {
             this.isActive = false;
             this.activeContacts.length = 0;

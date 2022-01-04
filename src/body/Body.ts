@@ -2,6 +2,7 @@ import Decimal from "decimal.js";
 import { Vector } from "..";
 import { Common } from "../core/Common";
 import { IEvent } from "../core/Events";
+import Sleeping from "../core/Sleeping";
 import Axes from "../geometry/Axes";
 import Bounds from "../geometry/Bounds";
 import Vertex from "../geometry/Vertex";
@@ -11,6 +12,10 @@ import MathUtil from "../math/MathUtil";
 // 外部可以设置的参数
 export interface BodyOpt {
   parent?: Body;
+  axes?: Vector[];
+  area?: Decimal;
+  mass?: Decimal;
+  inertia?: Decimal;
 }
 
 /**
@@ -31,6 +36,14 @@ interface BodyTotalProperty {
   area: Decimal;
   inertia: Decimal;
   centre: Vector;
+}
+
+export class ConstraintImpulse {
+  x: Decimal = MathUtil.ZERO;
+  y: Decimal = MathUtil.ZERO;
+
+  angle = MathUtil.ZERO;
+
 }
 
 /**
@@ -145,7 +158,7 @@ export default class Body implements IEvent {
   circleRadius?: Decimal | null;
 
   // 上一帧 的位置
-  positionPrev?: Vector;
+  positionPrev: Vector;
 
   // 上一帧 的角度
   anglePrev: Decimal;
@@ -173,46 +186,49 @@ export default class Body implements IEvent {
 
   inverseInertia: Decimal;
 
+  constraintImpulse: ConstraintImpulse = new ConstraintImpulse();
+
   constructor(option?: BodyOpt) {
     this.id = Common.nextId();
     this.type = "body";
     this.label = "Body";
     this.parts = [];
-    this.angle = Common.ZERO;
+    this.angle = MathUtil.ZERO;
     this.position = Vector.create();
+    this.positionPrev = Vector.create();
     this.vertices = Vertices.fromPath("L 0 0 L 40 0 L 40 40 L 0 40");
     this.bounds = Bounds.create(this.vertices);
     this.force = Vector.create();
-    this.torque = Common.ZERO;
+    this.torque = MathUtil.ZERO;
     this.positionImpulse = Vector.create();
-    this.totalContacts = Common.ZERO;
-    this.speed = Common.ZERO;
-    this.angularSpeed = Common.ZERO;
+    this.totalContacts = MathUtil.ZERO;
+    this.speed = MathUtil.ZERO;
+    this.angularSpeed = MathUtil.ZERO;
     this.velocity = Vector.create();
     this.angularVelocity = MathUtil.ZERO;
     this.isSensor = false;
     this.isStatic = false;
     this.isSleeping = false;
-    this.motion = Common.ZERO;
-    this.sleepCounter = Common.ZERO;
+    this.motion = MathUtil.ZERO;
+    this.sleepCounter = MathUtil.ZERO;
     this.sleepThreshold = new Decimal(60);
     this.density = new Decimal(0.001);
-    this.restitution = Common.ZERO;
+    this.restitution = MathUtil.ZERO;
     this.friction = new Decimal(0.1);
     this.frictionStatic = new Decimal(0.5);
     this.frictionAir = new Decimal(0.01);
     this.collisionFilter = new CollisionFilter();
     this.slop = new Decimal(0.05);
     this.timeScale = new Decimal(1);
-    this.circleRadius = Common.ZERO;
-    this.anglePrev = Common.ZERO;
+    this.circleRadius = MathUtil.ZERO;
+    this.anglePrev = MathUtil.ZERO;
     this.axes = [];
-    this.area = Common.ZERO;
-    this.mass = Common.ZERO;
-    this.inverseMass = Common.ZERO;
-    this.inertia = Common.ZERO;
-    this.inverseInertia = Common.ZERO;
-    // this.parent = option?.parent || this;
+    this.area = MathUtil.ZERO;
+    this.mass = MathUtil.ZERO;
+    this.inverseMass = MathUtil.ZERO;
+    this.inertia = MathUtil.ZERO;
+    this.inverseInertia = MathUtil.ZERO;
+    this.parent = option?.parent || this;
 
     this._initProperties(option);
   }
@@ -236,6 +252,87 @@ export default class Body implements IEvent {
 
   private _initProperties(options?: BodyOpt) {
     options = options || {};
+
+    this.set({
+      bounds: this.bounds || Bounds.create(this.vertices),
+      positionPrev: this.positionPrev || Vector.clone(this.position),
+      anglePrev: this.anglePrev || this.angle,
+      vertices: this.vertices,
+      parts: this.parts || [this],
+      isStatic: this.isStatic,
+      isSleeping: this.isSleeping,
+      parent: this.parent || this
+    })
+
+    Vertices.rotate(this.vertices, this.angle, this.position);
+    Axes.rotate(this.axes, this.angle);
+    this.bounds.update(this.vertices, this.velocity);
+
+    this.set({
+      axes: options?.axes || this.axes,
+      area: options?.area || this.area,
+      mass: options?.mass || this.mass,
+      inertia: options?.inertia || this.inertia,
+    })
+  }
+
+  set(settings: any, value?: any) {
+    let property: string;
+    if (typeof settings === 'string') {
+      this._setProperty(settings, value);
+    } else {
+      for(property in settings) {
+        if (!Object.prototype.hasOwnProperty.call(settings, property))
+                continue;
+
+        value = settings[property];
+        this._setProperty(property, value);
+      }
+    }
+  }
+
+  _setProperty(key: string, value: any) {
+    switch(key) {
+      case 'isStatic':
+                this.setStatic(value);
+                break;
+            case 'isSleeping':
+                Sleeping.set(this, value);
+                break;
+            case 'mass':
+              this.setMass( value);
+                break;
+            case 'density':
+              this.setDensity(value);
+                break;
+            case 'inertia':
+              this.setInertia(value);
+                break;
+            case 'vertices':
+              this.setVertices(value);
+                break;
+            case 'position':
+              this.setPosition(value);
+                break;
+            case 'angle':
+              this.setAngle(value);
+                break;
+            case 'velocity':
+              this.setVelocity(value);
+                break;
+            case 'angularVelocity':
+              this.setAngularVelocity(value);
+                break;
+            case 'parts':
+              this.setParts( value);
+                break;
+            case 'centre':
+              this.setCentre(value);
+                break;
+            default:
+              const a: any = this;
+              a[key] = value;
+    }
   }
 
   /**
@@ -258,8 +355,8 @@ export default class Body implements IEvent {
           inverseInertia: this.inverseInertia,
         };
 
-        this.restitution = Common.ZERO;
-        this.friction = Common.ZERO;
+        this.restitution = MathUtil.ZERO;
+        this.friction = MathUtil.ZERO;
         this.mass = MathUtil.Infinity;
         this.inertia = MathUtil.Infinity;
         this.density = MathUtil.Infinity;
@@ -418,7 +515,7 @@ export default class Body implements IEvent {
       Axes.rotate(part.axes, delta);
       part.bounds.update(part.vertices, this.velocity);
       if (i > 0) {
-        part.position.rotateAbout(delta, this.position, part.position);
+        part.position = part.position.rotateAbout(delta, this.position, part.position);
       }
     }
   }
@@ -443,7 +540,7 @@ export default class Body implements IEvent {
     if (!point) {
       this.setAngle(this.angle.add(rotation));
     } else {
-      this.position.rotateAbout(rotation, point);
+      this.position = this.position.rotateAbout(rotation, point);
       this.setAngle(this.angle.add(rotation));
     }
   }
@@ -509,10 +606,46 @@ export default class Body implements IEvent {
   }
 
   update(deltaTime: Decimal, timeScale: Decimal, correction: Decimal) {
-    const detalTimeSquared = deltaTime
+    const deltaTimeSquared = deltaTime
       .mul(timeScale)
       .mul(this.timeScale)
       .pow(new Decimal(2));
+
+    let frictionAir = MathUtil.one.sub(this.friction.mul(timeScale).mul(this.timeScale)),
+        velocityPrev = this.position.sub(this.positionPrev);
+    
+    this.velocity.x = (velocityPrev.x.mul(frictionAir).mul(correction)).add(this.force.x.div(this.mass).mul(deltaTimeSquared))
+    this.velocity.y = (velocityPrev.y.mul(frictionAir).mul(correction)).add(this.force.y.div(this.mass).mul(deltaTimeSquared))
+
+    this.positionPrev = this.position;
+    this.position = this.position.add(this.velocity);
+
+    // 更新角速度
+    this.angularVelocity = (this.angle.sub(this.anglePrev).mul(frictionAir).mul(correction)).add(this.torque.div(this.inertia).mul(deltaTimeSquared));
+    this.anglePrev = this.angle;
+    this.angle = this.angle.add(this.angularVelocity)
+
+    // 速度和加速度
+    this.speed = this.velocity.magnitude();
+    this.angularSpeed = this.angularSpeed.abs();
+
+    // 几何变换
+    for (let i = 0; i < this.parts.length; i++) {
+      let part = this.parts[i];
+
+      Vertices.translate(part.vertices, this.velocity);
+      if (i > 0) {
+        part.position = part.position.add(this.velocity);
+      }
+
+      if (!this.angularVelocity.eq(MathUtil.zero)) {
+        Vertices.rotate(part.vertices, this.angularVelocity, this.position);
+        Axes.rotate(part.axes, this.angularVelocity)
+        if (i > 0) {
+          part.position = part.position.rotateAbout(this.angularVelocity, this.position)
+        }
+      }
+    }
   }
 
   _totalProperties(): BodyTotalProperty {

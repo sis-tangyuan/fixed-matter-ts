@@ -9,7 +9,7 @@ import Pair from "./Pair";
 import Pairs from "./Pairs";
 
 export class OverlapInfo {
-    overlap: Decimal = Common.ZERO;
+    overlap: Decimal = MathUtil.ZERO;
     axis   : Vector = Vector.create();
 }
 
@@ -71,7 +71,7 @@ export default class Collision {
      * @type number
      * @default 0
      */
-    depth: Decimal = Common.ZERO;
+    depth: Decimal = MathUtil.ZERO;
     /**
      * A normalised `Vector` that represents the direction between the bodies that provides the minimum separating distance.
      * 一个提供给刚体间最小分离距离的单元化向量
@@ -161,9 +161,9 @@ export default class Collision {
         
         // 保证normal永远背离bodyA
         if (minAxis.dot(bodyB.position.sub(bodyA.position)).lt(MathUtil.zero)) {
-            normal.clone(minAxis)
+            normal.copy(minAxis)
         } else {
-            normal.clone(minAxis.mul(new Decimal(-1)))
+            normal.copy(minAxis.mul(new Decimal(-1)))
         }
 
         collision.tangent = normal.prep();
@@ -226,7 +226,7 @@ export default class Collision {
             dot,
             i,
             j,
-            zero = Common.ZERO;
+            zero = MathUtil.ZERO;
 
         for (i = 0; i < axesLength; i++) {
             let axis = axes[i],
