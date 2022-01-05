@@ -45,7 +45,7 @@ test("多边形惯性", () => {
     
 
     const inertia = Vertices.inertia(vertices, new Decimal(1))
-    console.log("多边形惯性: ", inertia.toString())
+    // console.log("多边形惯性: ", inertia.toString())
     // expect(area.eq(new Decimal(1600))).toBe(true)
 })
 
@@ -57,11 +57,11 @@ test("多边形旋转", () => {
         Vertex.createByXY(0, 40),
     ]
     const centre = Vertices.centre(vertices)
-    console.log("质心: ", centre.toString())
+    // console.log("质心: ", centre.toString())
     vertices = Vertices.rotate(vertices, MathUtil.angleToRadian(new Decimal(90)), centre)
     vertices.forEach((vertex: Vertex, index: number) => {
         const point = vertex.vector;
-        console.log(`点: ${point.toString()}`);
+        // console.log(`点: ${point.toString()}`);
     })
 })
 

@@ -17,6 +17,10 @@ export interface EngineOptions {
     world?: Composite;
     pairs?: Pairs;
     detector?: Detector;
+    positionIterations?: number;
+    velocityIterations?: number;
+    constraintIterations?: number;
+    enableSleeping?: boolean;
 }
 
 export class Gravity {
@@ -52,12 +56,15 @@ export default class Engine implements IEvent{
         this.world = options?.world || Composite.create({label: "World"})
         this.pairs = options?.pairs || Pairs.create()
         this.detector = options?.detector || Detector.create();
+        // this.positionIterations = options?.positionIterations || this.positionIterations;
+        // this.velocityIterations = options?this.velocityIterations || this.velocityIterations;
     }
 
-    public static create(options?: EngineOptions) {
-        let engine = new Engine();
+    public static create(options?: EngineOptions): Engine {
+        let engine = new Engine(options);
 
         Common.extend(engine, options);
+        return engine;
     }
 
     update(delta: Decimal = new Decimal(16), correcttion: Decimal = MathUtil.one) {

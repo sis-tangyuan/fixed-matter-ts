@@ -22,10 +22,10 @@ export class Common {
       deepClone,
       firstArg = args[0];
     if (typeof firstArg == "boolean") {
-      argStart = 2;
+      argStart = 1;
       deepClone = firstArg;
     } else {
-      argStart = 1;
+      argStart = 0;
       deepClone = true;
     }
 
@@ -50,6 +50,7 @@ export class Common {
         }
       }
     }
+    return obj;
   }
 
   /**

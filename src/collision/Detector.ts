@@ -1,5 +1,6 @@
 import Body, { CollisionFilter } from "../body/Body";
 import { Common } from "../core/Common";
+import MathUtil from "../math/MathUtil";
 import Collision from "./Collision";
 import Pairs from "./Pairs";
 
@@ -34,7 +35,7 @@ export default class Detector {
      */
     static create(option?: any): Detector {
         let detector = new Detector();
-        detector = Common.extend(detector, option)
+        Common.extend(detector, option)
         return detector;
     }
 
@@ -66,8 +67,11 @@ export default class Detector {
         return (filterA.mask & filterB.category) !== 0 && (filterB.mask & filterA.category) !== 0;
     }
 
+    // TODO: 可能有精度问题
     _compareBoundsX(bodyA: Body, bodyB: Body): number {
-        return bodyA.bounds.min.x.sub(bodyB.bounds.min.x).toNumber()
+        // return bodyA.bounds.min.x.sub(bodyB.bounds.min.x).toNumber()
+        const c = bodyA.bounds.min.x.sub(bodyB.bounds.min.x);
+        return c.isZero() ? 0 : c.gt(MathUtil.zero) ? 1 : -1;
     }
 
         /**
@@ -97,7 +101,7 @@ export default class Detector {
                 partsALength = bodyA.parts.length,
                 partsASingle = partsALength === 1;
 
-            for (j = i+i; j < bodiesLength; j++) {
+            for (j = i+1; j < bodiesLength; j++) {
                 var bodyB = this.bodies[j],
                     boundsB = bodyB.bounds;
                 

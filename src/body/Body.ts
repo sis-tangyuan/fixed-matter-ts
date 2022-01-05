@@ -3,6 +3,7 @@ import { Vector } from "..";
 import { Common } from "../core/Common";
 import { IEvent } from "../core/Events";
 import Sleeping from "../core/Sleeping";
+import { BodiesOpt } from "../factory/Bodies";
 import Axes from "../geometry/Axes";
 import Bounds from "../geometry/Bounds";
 import Vertex from "../geometry/Vertex";
@@ -38,11 +39,17 @@ interface BodyTotalProperty {
   centre: Vector;
 }
 
-export class ConstraintImpulse {
-  x: Decimal = MathUtil.ZERO;
-  y: Decimal = MathUtil.ZERO;
+export class ConstraintImpulse extends Vector {
+  // x: Decimal = MathUtil.ZERO;
+  // y: Decimal = MathUtil.ZERO;
 
-  angle = MathUtil.ZERO;
+  angle2 = MathUtil.ZERO;
+  // angle2: Decimal = MathUtil.ZERO;
+
+  constructor() {
+    super(MathUtil.ZERO, MathUtil.ZERO);
+
+  }
 
 }
 
@@ -73,167 +80,134 @@ export default class Body implements IEvent {
   id: number;
 
   // 类型
-  type: string;
+  type: string = "body"
 
   // 标签
-  label: string;
+  label: string = "Body"
 
-  parts: Body[];
+  parts: Body[] = []
 
   // plugin = {}
 
   // 角度
-  angle: Decimal;
+  angle: Decimal = MathUtil.ZERO;
 
   // 顶点列表
-  vertices: Vertex[];
+  vertices: Vertex[] = [];
 
   // 位置
-  position: Vector;
-
-  // 作用力
-  force: Vector;
-
-  // 扭力
-  torque: Decimal;
-
-  // 位置冲量
-  positionImpulse: Vector;
-
-  // 全部触摸数量
-  totalContacts: Decimal;
-
-  // 速率
-  speed: Decimal;
-
-  // 角速率
-  angularSpeed: Decimal;
-
-  // 速度
-  velocity: Vector;
-
-  // 角速度
-  angularVelocity: Decimal;
-
-  // 是否是传感器
-  isSensor: boolean;
-
-  // 是否静态
-  isStatic: boolean;
-
-  // 是否休眠
-  isSleeping: boolean;
-
-  // 总动量
-  motion: Decimal;
-
-  // 随眠计数
-  sleepCounter: Decimal;
-
-  // 睡眠阀值
-  sleepThreshold: Decimal;
-
-  // 密度
-  density: Decimal;
-
-  // 恢复系数
-  restitution: Decimal;
-
-  // 摩擦力
-  friction: Decimal;
-
-  // 静摩擦力
-  frictionStatic: Decimal;
-
-  // 空气摩擦力
-  frictionAir: Decimal;
-
-  // 碰撞过滤器
-  collisionFilter: CollisionFilter;
-
-  slop: Decimal;
-
-  timeScale: Decimal;
-
-  circleRadius?: Decimal | null;
+  position: Vector = Vector.create();
 
   // 上一帧 的位置
-  positionPrev: Vector;
+  positionPrev: Vector = Vector.create();
+
+  // 作用力
+  force: Vector = Vector.create();
+
+  // 扭力
+  torque: Decimal = MathUtil.ZERO;
+
+  // 位置冲量
+  positionImpulse: Vector = Vector.create();
+
+  // 全部触摸数量
+  totalContacts: Decimal = MathUtil.ZERO;
+
+  // 速率
+  speed: Decimal = MathUtil.ZERO;
+
+  // 角速率
+  angularSpeed: Decimal = MathUtil.ZERO;
+
+  // 速度
+  velocity: Vector = Vector.create();
+
+  // 角速度
+  angularVelocity: Decimal = MathUtil.ZERO;
+
+  // 是否是传感器
+  isSensor: boolean = false;
+
+  // 是否静态
+  isStatic: boolean = false;
+
+  // 是否休眠
+  isSleeping: boolean = false;
+
+  // 总动量
+  motion: Decimal = MathUtil.ZERO;
+
+  // 随眠计数
+  sleepCounter: Decimal = MathUtil.ZERO;
+
+  // 睡眠阀值
+  sleepThreshold: Decimal = new Decimal(60);
+
+  // 密度
+  density: Decimal = new Decimal(0.001);
+
+  // 恢复系数
+  restitution: Decimal = MathUtil.ZERO;
+
+  // 摩擦力
+  friction: Decimal = new Decimal(0.1);
+
+  // 静摩擦力
+  frictionStatic: Decimal = new Decimal(0.5);
+
+  // 空气摩擦力
+  frictionAir: Decimal = new Decimal(0.01);
+
+  // 碰撞过滤器
+  collisionFilter: CollisionFilter = new CollisionFilter();
+
+  slop: Decimal = new Decimal(0.05);
+
+  timeScale: Decimal = MathUtil.ONE;
+
+  circleRadius?: Decimal | null = MathUtil.ZERO;
 
   // 上一帧 的角度
-  anglePrev: Decimal;
+  anglePrev: Decimal = MathUtil.ZERO;
 
   parent: Body;
 
-  axes: Vector[];
+  axes: Vector[] = [];
 
   // 面积
-  area: Decimal;
+  area: Decimal = MathUtil.ZERO;
 
   // 质量
-  mass: Decimal;
+  mass: Decimal = MathUtil.ZERO;
 
   // 质量的逆
-  inverseMass: Decimal;
+  inverseMass: Decimal = MathUtil.ZERO;
 
   // 惯性
-  inertia: Decimal;
+  inertia: Decimal = MathUtil.ZERO;
+
+  /**
+   * 惯性的逆
+   */
+  inverseInertia: Decimal = MathUtil.ZERO;
 
   // AABB
   bounds: Bounds;
 
   _orignal?: BodyOriginal | null;
 
-  inverseInertia: Decimal;
-
   constraintImpulse: ConstraintImpulse = new ConstraintImpulse();
 
-  constructor(option?: BodyOpt) {
+  constructor(option?: BodiesOpt) {
     this.id = Common.nextId();
-    this.type = "body";
-    this.label = "Body";
-    this.parts = [];
-    this.angle = MathUtil.ZERO;
-    this.position = Vector.create();
-    this.positionPrev = Vector.create();
-    this.vertices = Vertices.fromPath("L 0 0 L 40 0 L 40 40 L 0 40");
+    Common.extend(this, option)
     this.bounds = Bounds.create(this.vertices);
-    this.force = Vector.create();
-    this.torque = MathUtil.ZERO;
-    this.positionImpulse = Vector.create();
-    this.totalContacts = MathUtil.ZERO;
-    this.speed = MathUtil.ZERO;
-    this.angularSpeed = MathUtil.ZERO;
-    this.velocity = Vector.create();
-    this.angularVelocity = MathUtil.ZERO;
-    this.isSensor = false;
-    this.isStatic = false;
-    this.isSleeping = false;
-    this.motion = MathUtil.ZERO;
-    this.sleepCounter = MathUtil.ZERO;
-    this.sleepThreshold = new Decimal(60);
-    this.density = new Decimal(0.001);
-    this.restitution = MathUtil.ZERO;
-    this.friction = new Decimal(0.1);
-    this.frictionStatic = new Decimal(0.5);
-    this.frictionAir = new Decimal(0.01);
-    this.collisionFilter = new CollisionFilter();
-    this.slop = new Decimal(0.05);
-    this.timeScale = new Decimal(1);
-    this.circleRadius = MathUtil.ZERO;
-    this.anglePrev = MathUtil.ZERO;
-    this.axes = [];
-    this.area = MathUtil.ZERO;
-    this.mass = MathUtil.ZERO;
-    this.inverseMass = MathUtil.ZERO;
-    this.inertia = MathUtil.ZERO;
-    this.inverseInertia = MathUtil.ZERO;
     this.parent = option?.parent || this;
 
     this._initProperties(option);
   }
 
-  static create(options: BodyOpt): Body {
+  static create(options?: BodiesOpt): Body {
     const body = new Body(options);
     return body;
   }

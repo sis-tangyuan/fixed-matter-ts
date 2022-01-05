@@ -15,7 +15,7 @@ export default class Pairs {
 
     collisionEnd: Pair[] = [];
 
-    static create(options?: any) {
+    static create(options?: any): Pairs {
         let pairs = new Pairs();
         Common.extend(pairs, options);
         return pairs;

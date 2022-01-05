@@ -59,14 +59,10 @@ export default class Vector {
 
   /**
    * 克隆
-   * TODO: 测试 toNumber是否有精度问题
    * @param vector
    * @returns
    */
   static clone(vector: Vector): Vector {
-    // const x = new Decimal(vector.x.toNumber());
-    // const y = new Decimal(vector.y.toNumber());
-    // return new Vector(x, y);
     return Vector.create(vector.x, vector.y);
   }
 

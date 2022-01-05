@@ -85,13 +85,13 @@ export default class Constraint implements ConstraintOpt {
             let body = bodies[i],
                 impluse = body.constraintImpulse;
 
-            if (body.isSleeping || (impluse.x.isZero() && impluse.y.isZero() && impluse.angle.isZero())) {
+            if (body.isSleeping || (impluse.x.isZero() && impluse.y.isZero() && impluse.angle2.isZero())) {
                 continue;
             }
 
             body.position.x = body.position.x.add(impluse.x)
             body.position.y = body.position.x.add(impluse.y)
-            body.angle = body.angle.add(impluse.angle);
+            body.angle = body.angle.add(impluse.angle2);
         }
 
         
@@ -198,7 +198,7 @@ export default class Constraint implements ConstraintOpt {
             
             // 应用扭力
             torque = ((pointA.cross(force)).div(resistanceTotal)).mul(Constraint._torqueDampen.mul(bodyA.inverseInertia).mul(MathUtil.one.sub(constraint.angularStiffness)))
-            bodyA.constraintImpulse.angle = bodyA.constraintImpulse.angle.sub(torque);
+            bodyA.constraintImpulse.angle2 = bodyA.constraintImpulse.angle2.sub(torque);
             bodyA.angle = bodyA.angle.sub(torque)
         }
 
@@ -217,7 +217,7 @@ export default class Constraint implements ConstraintOpt {
             }
 
             torque = (pointB.cross(force).div(resistanceTotal)).mul(Constraint._torqueDampen.mul(bodyB.inverseInertia.mul(MathUtil.one.sub(constraint.angularStiffness))))
-            bodyB.constraintImpulse.angle = bodyB.constraintImpulse.angle.add(torque)
+            bodyB.constraintImpulse.angle2 = bodyB.constraintImpulse.angle2.add(torque)
             bodyB.angle = bodyB.angle.add(torque);
         }
     }
@@ -227,7 +227,7 @@ export default class Constraint implements ConstraintOpt {
             let body = bodies[i],
                 impluse = body.constraintImpulse;
 
-            if (body.isStatic || (impluse.x.isZero() || impluse.y.isZero() && impluse.angle.isZero())) {
+            if (body.isStatic || (impluse.x.isZero() || impluse.y.isZero() && impluse.angle2.isZero())) {
                 continue;
             }
 
@@ -243,18 +243,18 @@ export default class Constraint implements ConstraintOpt {
                     part.position = part.position.add(tp);
                 }
 
-                if (!impluse.angle.isZero()) {
-                    Vertices.rotate(part.vertices, impluse.angle, body.position);
-                    Axes.rotate(part.axes, impluse.angle);
+                if (!impluse.angle2.isZero()) {
+                    Vertices.rotate(part.vertices, impluse.angle2, body.position);
+                    Axes.rotate(part.axes, impluse.angle2);
                     if (j > 0) {
-                        part.position.rotateAbout(impluse.angle, body.position, part.position);
+                        part.position.rotateAbout(impluse.angle2, body.position, part.position);
                     }
 
                     part.bounds.update(part.vertices, body.velocity);
                 }
             }
 
-            impluse.angle = impluse.angle.mul(Constraint._warming)
+            impluse.angle2 = impluse.angle2.mul(Constraint._warming)
             impluse.x = impluse.x.mul(Constraint._warming)
             impluse.y = impluse.y.mul(Constraint._warming)
 

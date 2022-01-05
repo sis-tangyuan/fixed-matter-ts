@@ -269,7 +269,8 @@ export default class Vertices {
       const pointA = vertexA.vector;
       const pointB = vertextB.vector;
       // TODO: 这里可能会有精度问题
-      return centre.angle(pointA).sub(centre.angle(pointB)).toNumber();
+      const c = centre.angle(pointA).sub(centre.angle(pointB));
+      return c.isZero() ? 0 : c.gt(MathUtil.zero) ? 1 : -1;;
     });
 
     return vertices;
@@ -373,7 +374,7 @@ export default class Vertices {
     vertices.sort(function (vertexA: Vertex, vertexB: Vertex) {
       const dx = vertexA.x.sub(vertexB.x);
       // TODO: toNumber 的精度未验证过
-      return dx.eq(zero) ? vertexA.y.sub(vertexB.y).toNumber() : dx.toNumber();
+      return dx.isZero() ? vertexA.y.sub(vertexB.y).toNumber() : dx.toNumber();
     });
 
     // build lower hull
