@@ -1,4 +1,5 @@
 import Decimal from "decimal.js";
+import { Common } from "../core/Common";
 import Collision from "./Collision";
 import Pair from "./Pair";
 
@@ -13,6 +14,12 @@ export default class Pairs {
     collisionActive: Pair[] = [];
 
     collisionEnd: Pair[] = [];
+
+    static create(options?: any) {
+        let pairs = new Pairs();
+        Common.extend(pairs, options);
+        return pairs;
+    }
     
     update(collisions: Collision[], timestamp: Decimal) {
         let pairsList = this.list,

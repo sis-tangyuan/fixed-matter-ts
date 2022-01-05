@@ -32,7 +32,7 @@ export default class Detector {
      * @param option 
      * @returns 
      */
-    static create(option: any): Detector {
+    static create(option?: any): Detector {
         let detector = new Detector();
         detector = Common.extend(detector, option)
         return detector;

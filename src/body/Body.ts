@@ -532,7 +532,7 @@ export default class Body implements IEvent {
     this.angularSpeed = velocity.abs();
   }
 
-  setTranslate(translation: Vector) {
+  translate(translation: Vector) {
     this.setPosition(this.position.add(translation));
   }
 

@@ -1,6 +1,7 @@
 import Decimal from "decimal.js";
 import { Vector } from "..";
 import { Common } from "../core/Common";
+import MathUtil from "../math/MathUtil";
 import Vertex from "./Vertex";
 
 export default class Axes {
@@ -21,7 +22,7 @@ export default class Axes {
         nextPoint.y.sub(curPoint.y),
         curPoint.x.sub(nextPoint.x)
       ).normalise();
-      const gradient = normal.y.eq(Common.ZERO)
+      const gradient = normal.y.eq(MathUtil.ZERO)
         ? new Decimal(Infinity)
         : normal.x.div(normal.y);
       const key = gradient.toFixed(3).toString();
@@ -32,7 +33,7 @@ export default class Axes {
   }
 
   public static rotate(axes: Vector[], angle: Decimal) {
-    if (angle.eq(Common.ZERO)) return;
+    if (angle.eq(MathUtil.ZERO)) return;
     for (let i = 0; i < axes.length; i++) {
       axes[i].rotate(angle, axes[i]);
     }

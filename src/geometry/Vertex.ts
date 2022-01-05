@@ -6,9 +6,9 @@ import { Common } from "../core/Common";
 /**
  * 定点
  */
-export default class Vertex {
-    x: Decimal;
-    y: Decimal;
+export default class Vertex extends Vector {
+    // x: Decimal;
+    // y: Decimal;
     index: number; // 整数类型的下标
     isInternal: boolean;
     body?: Body;
@@ -22,8 +22,9 @@ export default class Vertex {
      * @param isInternal 
      */
     constructor(x: Decimal, y: Decimal, body?: Body, index: number = 0, isInternal: boolean = false) {
-        this.x = x;
-        this.y = y;
+        super(x, y)
+        // this.x = x;
+        // this.y = y;
         this.body = body;
         this.index = index;
         this.isInternal = isInternal;

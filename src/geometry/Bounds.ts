@@ -27,7 +27,7 @@ export default class Bounds {
      * @param vertices 顶点列表
      * @returns 一个新的AABB
      */
-    public static create(vertices: Vertex[]): Bounds {
+    public static create(vertices: Vertex[] | Vector[]): Bounds {
         const bounds = new Bounds();
         bounds.update(vertices);
         return bounds;
@@ -38,7 +38,7 @@ export default class Bounds {
      * @param vertices 
      * @param velocity 
      */
-    update(vertices: Vertex[], velocity?: Vector) {
+    update(vertices: Vertex[] | Vector[], velocity?: Vector) {
         for (let i = 0; i < vertices.length; i++) {
             const vertex = vertices[i];
             if (vertex.x.gt(this.max.x)) this.max.x = vertex.x;

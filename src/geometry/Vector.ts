@@ -225,6 +225,12 @@ export default class Vector {
     return Vector.fromFixXY(this.x.mul(scalar), this.y.mul(scalar));
   }
 
+  selfMul(scalar: Decimal): this {
+    this.x = this.x.mul(scalar);
+    this.y = this.y.mul(scalar)
+    return this;
+  }
+
   /**
    * 除与标量
    * @param scalar

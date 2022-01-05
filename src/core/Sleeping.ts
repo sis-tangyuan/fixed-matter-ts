@@ -1,6 +1,8 @@
 import Decimal from "decimal.js";
 import { Vector } from "..";
 import Body from "../body/Body";
+import Pair from "../collision/Pair";
+import MathUtil from "../math/MathUtil";
 import { Common } from "./Common";
 import Events from "./Events";
 
@@ -14,7 +16,7 @@ export default class Sleeping {
 
     public static update(bodies: Body[], timeScale: Decimal) {
         var timeFactor = timeScale.mul(timeScale).mul(timeScale);
-        const zero = Common.ZERO;
+        const zero = MathUtil.ZERO;
         // 更新 刚体 睡眠状态
         for (let i = 0; i < bodies.length; i++) {
             const body = bodies[i],
@@ -52,7 +54,7 @@ export default class Sleeping {
      */
     public static set(body: Body, isSleeping: boolean) {
         var wasSleeping = body.isSleeping
-        var zero = Common.ZERO;
+        var zero = MathUtil.ZERO;
         if (isSleeping) {
             body.isSleeping = true;
             body.sleepCounter = body.sleepThreshold.add(zero)
@@ -61,9 +63,9 @@ export default class Sleeping {
 
             body.positionPrev = Vector.fromFixXY(body.position.x, body.position.y)
             body.anglePrev = body.angle.add(zero);
-            body.speed = Common.ZERO;
-            body.angularSpeed = Common.ZERO;
-            body.motion = Common.ZERO;
+            body.speed = MathUtil.ZERO;
+            body.angularSpeed = MathUtil.ZERO;
+            body.motion = MathUtil.ZERO;
 
             if (!wasSleeping) {
                 Events.trigger(body, "sleepStart")
@@ -74,6 +76,33 @@ export default class Sleeping {
 
             if (wasSleeping) {
                 Events.trigger(body, "sleepEnd")
+            }
+        }
+    }
+
+    static afterCollisions(pairs: Pair[], timeScale: Decimal) {
+        let timeFactor = timeScale.mul(timeScale).mul(timeScale)
+
+        for (let i = 0; i < pairs.length; i++) {
+            let pair = pairs[i];
+
+            if (!pair.isActive) continue;
+
+            let collision = pair.collision,
+                bodyA = collision.bodyA.parent,
+                bodyB = collision.bodyB.parent;
+            
+            if ((bodyA.isSleeping && bodyB.isSleeping) || bodyA.isStatic || bodyB.isStatic) {
+                continue;
+            }
+
+            if (bodyA.isSleeping || bodyB.isSleeping) {
+                var sleepingBody = (bodyA.isSleeping && !bodyA.isStatic) ? bodyA : bodyB,
+                    movingBody = sleepingBody === bodyA ? bodyB : bodyA;
+
+                if (!sleepingBody.isStatic && movingBody.motion.gt(Sleeping._motionWakeThreshold.mul(timeFactor))) {
+                    Sleeping.set(sleepingBody, false);
+                }
             }
         }
     }

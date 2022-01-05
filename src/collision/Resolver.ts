@@ -163,7 +163,7 @@ export default class Resolver {
         }
     }
 
-    solveVelocity(pairs: Pair[], timeScale: Decimal) {
+    static solveVelocity(pairs: Pair[], timeScale: Decimal) {
         let timeScaleSquared = timeScale.mul(timeScale),
             restingThresh = Resolver._restingThresh.mul(timeScaleSquared),
             frictionNormalMultiplier = Resolver._frictionNormalMultiplier,
@@ -195,8 +195,8 @@ export default class Resolver {
                 inverseMassTotal = bodyA.inverseMass.add(bodyB.inverseMass),
                 friction = pair.friction.mul(pair.frictionStatic).mul(frictionNormalMultiplier).mul(timeScale);
             
-            bodyA.position.sub(bodyAVelocity, bodyAVelocity)
-            bodyB.position.sub(bodyBVelocity, bodyBVelocity)
+            bodyAVelocity = bodyA.position.sub(bodyA.positionPrev)
+            bodyBVelocity = bodyB.position.sub(bodyB.positionPrev)
 
             bodyA.angularVelocity = bodyA.angle.sub(bodyA.anglePrev)
             bodyB.angularVelocity = bodyB.angle.sub(bodyB.anglePrev)
@@ -205,7 +205,97 @@ export default class Resolver {
                 let contact = contacts[j],
                     contactVertx = contact.vertex.vector;
                 
+                const offsetA = contactVertx.sub(bodyA.position),
+                    offsetB = contactVertx.sub(bodyB.position);
+
+                const velocityPointAX = bodyAVelocity.x.sub(offsetA.y.mul(bodyA.angularVelocity))
+                const velocityPointAY = bodyAVelocity.y.add(offsetA.x.mul(bodyA.angularVelocity))
+
+                const velocityPointBX = bodyBVelocity.x.sub(offsetB.y.mul(bodyB.angularVelocity))
+                const velocityPointBY = bodyBVelocity.y.add(offsetB.x.mul(bodyB.angularVelocity))
+
+                // 速度
+                const velocityPointA = new Vector(velocityPointAX, velocityPointAY)
+                const velocityPointB = new Vector(velocityPointBX, velocityPointBY)
+
+                // 相对速度
+                const relativeVelocity = velocityPointA.sub(velocityPointB)
+
+                let normalVelocity = normal.dot(relativeVelocity),
+                    tangentVelocity = tangent.dot(relativeVelocity)
+
+                // 库伦摩擦
+                let normalOverlap = pair.separation.add(normalVelocity);
+                let normalForce = Decimal.min(normalOverlap, MathUtil.ONE)
+                normalForce = normalForce.lt(MathUtil.zero) ? MathUtil.ZERO : normalForce;
+
+
+                let frictionLimit = normalForce.mul(friction)
+
+                if (tangentVelocity.gt(frictionLimit) || tangentVelocity.neg().gt(frictionLimit)) {
+                    maxFriction = tangentVelocity.gt(MathUtil.zero) ? tangentVelocity : tangentVelocity.neg()
+                    tangentImpulse = pair.friction.mul(tangentVelocity.gt(MathUtil.zero) ? MathUtil.one : MathUtil.negOne).mul(timeScaleSquared)
+
+                    if (tangentImpulse.lt(maxFriction.neg())) {
+                        tangentImpulse = maxFriction.neg()
+                    } else if (tangentImpulse.gt(maxFriction)){
+                        tangentImpulse = maxFriction.add(MathUtil.zero);
+                    }   
+                } else {
+                    tangentImpulse = tangentVelocity.add(MathUtil.zero)
+                    maxFriction = NumberMaxValue.add(MathUtil.zero)
+                }
                 
+                // account for mass, inertia and contact offset
+                const oAcN = offsetA.cross(normal),
+                    oBcN = offsetB.cross(normal),
+                    share = contactShare.div(
+                        inverseMassTotal.add(
+                            bodyA.inverseInertia.mul(oAcN).mul(oAcN)
+                        ).add(
+                            bodyB.inverseInertia.mul(oBcN).mul(oBcN)
+                        )
+                    )
+
+                // 原始冲量
+                let normalImpulse = (MathUtil.one.add(pair.restitution)).mul(normalVelocity).mul(share);
+                tangentImpulse = tangentImpulse.mul(share)
+
+                const normalVeclocitySquared = normalVelocity.mul(normalVelocity)
+                if (normalVeclocitySquared.gt(restingThresh) && normalVelocity.lt(MathUtil.zero)) {
+                    // 高法线速度因此清理触碰发现冲量
+                    contact.normalImpulse = MathUtil.ZERO;
+                } else {
+                    // 静态碰撞约束，冲量约束趋于0
+                    var contactNormalImpulse = contact.normalImpulse;
+                    contact.normalImpulse = contact.normalImpulse.add(normalImpulse)
+                    contact.normalImpulse = Decimal.min(contact.normalImpulse, MathUtil.ZERO);
+                    normalImpulse = contact.normalImpulse.sub(contactNormalImpulse)
+                }
+
+                const tangentVelocitySquared = tangentVelocity.mul(tangentVelocity)
+                if (tangentVelocitySquared.gt(restingThreshTangent)) {
+                    contact.tangentImpulse = MathUtil.ZERO;
+                } else {
+                    let contactTangetImpulse = contact.tangentImpulse;
+                    contact.tangentImpulse = contact.tangentImpulse.add(tangentImpulse);
+                    if (contact.tangentImpulse.lt(maxFriction.neg())) contact.tangentImpulse = maxFriction.neg()
+                    if (contact.tangentImpulse.gt(maxFriction)) contact.tangentImpulse = maxFriction.add(MathUtil.zero)
+                    tangentImpulse = contact.tangentImpulse.sub(contactTangetImpulse)
+                }
+
+                // 触碰的总冲量
+                let impulse = normal.mul(normalImpulse).add(tangent.mul(tangentImpulse))
+
+                if (!(bodyA.isStatic || bodyA.isSleeping)) {
+                    bodyA.positionPrev = bodyA.positionPrev.add(impulse.mul(bodyA.inverseMass))
+                    bodyA.anglePrev = bodyA.anglePrev.add(offsetA.cross(impulse).mul(bodyA.inverseInertia))
+                }
+
+                if (!(bodyB.isStatic || bodyB.isSleeping)) {
+                    bodyB.positionPrev = bodyB.positionPrev.add(impulse.mul(bodyB.inverseMass))
+                    bodyB.anglePrev = bodyB.anglePrev.add(offsetA.cross(impulse).mul(bodyB.inverseInertia))
+                }
             }
         }
     }

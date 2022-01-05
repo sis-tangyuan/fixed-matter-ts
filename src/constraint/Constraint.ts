@@ -80,7 +80,7 @@ export default class Constraint implements ConstraintOpt {
         return constraint;
     }
 
-    preSolveAll(bodies: Body[]) {
+    static preSolveAll(bodies: Body[]) {
         for(let i = 0; i < bodies.length; i++) {
             let body = bodies[i],
                 impluse = body.constraintImpulse;
@@ -97,7 +97,7 @@ export default class Constraint implements ConstraintOpt {
         
     }
 
-    solveAll(constraints: Constraint[], timeScale: Decimal) {
+    static solveAll(constraints: Constraint[], timeScale: Decimal) {
         for(let i = 0; i < constraints.length; i++) {
             let constraint = constraints[i],
             fixedA = !constraint.bodyA || (constraint.bodyA && constraint.bodyA.isStatic),
@@ -117,7 +117,7 @@ export default class Constraint implements ConstraintOpt {
         }
     }
 
-    solve(constraint: Constraint, timeScale: Decimal) {
+    static solve(constraint: Constraint, timeScale: Decimal) {
         let bodyA = constraint.bodyA,
             bodyB = constraint.bodyB,
             pointA = constraint.pointA,
@@ -158,7 +158,7 @@ export default class Constraint implements ConstraintOpt {
         // 使用 Gauss-Siedel 方法求解距离约束
         // solve distance constraint with Gauss-Siedel method
         let difference = (currentLength.sub(constraint.length)).div(currentLength),
-            stiffness = this.stiffness.lt(MathUtil.one) ? this.stiffness.mul(timeScale) : this.stiffness,
+            stiffness = constraint.stiffness.lt(MathUtil.one) ? constraint.stiffness.mul(timeScale) : constraint.stiffness,
             force = delta.mul(difference.mul(stiffness)),
             massTotal = (bodyA ? bodyA.inverseMass : MathUtil.zero).add(bodyB ? bodyB.inverseMass : MathUtil.zero),
             invertiaTotal = (bodyA ? bodyA.inverseInertia : MathUtil.zero).add(bodyB ? bodyB.inverseInertia : MathUtil.zero),
@@ -169,7 +169,7 @@ export default class Constraint implements ConstraintOpt {
             normalVelocity: Decimal = MathUtil.ZERO,
             relativeVelocity: Vector;
         
-        if (this.damping.gt(MathUtil.zero)) {
+        if (constraint.damping.gt(MathUtil.zero)) {
             let zero = Vector.create();
             normal = delta.div(currentLength)
 
@@ -192,12 +192,12 @@ export default class Constraint implements ConstraintOpt {
 
             bodyA.position = bodyA.position.sub(shareForce);
 
-            if (this.damping.gt(MathUtil.zero)) {
+            if (constraint.damping.gt(MathUtil.zero)) {
                 bodyA.positionPrev = bodyA.positionPrev.sub(normal.mul(constraint.damping.mul(normalVelocity).mul(share)))
             }
             
             // 应用扭力
-            torque = ((pointA.cross(force)).div(resistanceTotal)).mul(Constraint._torqueDampen.mul(bodyA.inverseInertia).mul(MathUtil.one.sub(this.angularStiffness)))
+            torque = ((pointA.cross(force)).div(resistanceTotal)).mul(Constraint._torqueDampen.mul(bodyA.inverseInertia).mul(MathUtil.one.sub(constraint.angularStiffness)))
             bodyA.constraintImpulse.angle = bodyA.constraintImpulse.angle.sub(torque);
             bodyA.angle = bodyA.angle.sub(torque)
         }
@@ -212,17 +212,17 @@ export default class Constraint implements ConstraintOpt {
 
             bodyB.position = bodyB.position.add(shareForce);
 
-            if (this.damping.gt(MathUtil.zero)) {
+            if (constraint.damping.gt(MathUtil.zero)) {
                 bodyB.positionPrev = bodyB.positionPrev.add(normal.mul(constraint.damping.mul(normalVelocity).mul(share)))
             }
 
-            torque = (pointB.cross(force).div(resistanceTotal)).mul(Constraint._torqueDampen.mul(bodyB.inverseInertia.mul(MathUtil.one.sub(this.angularStiffness))))
+            torque = (pointB.cross(force).div(resistanceTotal)).mul(Constraint._torqueDampen.mul(bodyB.inverseInertia.mul(MathUtil.one.sub(constraint.angularStiffness))))
             bodyB.constraintImpulse.angle = bodyB.constraintImpulse.angle.add(torque)
             bodyB.angle = bodyB.angle.add(torque);
         }
     }
 
-    postSolveAll(bodies: Body[]) {
+    static postSolveAll(bodies: Body[]) {
         for(let i = 0; i < bodies.length; i++) {
             let body = bodies[i],
                 impluse = body.constraintImpulse;

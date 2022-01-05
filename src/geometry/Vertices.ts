@@ -307,6 +307,58 @@ export default class Vertices {
     return flag !== 0;
   }
 
+  static chamfer(vertices: Vertex[], radius: Decimal[], quality: Decimal = MathUtil.negONE, qualityMin: Decimal = new Decimal(2), qualityMax: Decimal = new Decimal(14)): Vertex[] {
+    let newVertices: Vertex[] = []
+
+    for (let i = 0; i < vertices.length; i++) {
+      let preVertex = vertices[i - 1 >= 0 ? i - 1 : vertices.length - 1],
+        vertext = vertices[i],
+        nextVertext = vertices[(i + 1) % vertices.length],
+        currentRadius = radius[i < radius.length ? i : radius.length - 1];
+      
+      if (currentRadius.isZero()) {
+        newVertices.push(vertext);
+        continue;
+      }
+
+      let preNormal = preVertex.sub(vertext).prep().normalise();
+      let nextNorml = vertext.sub(nextVertext).prep().normalise();
+      let two = new Decimal(2);
+      let diagonalRadius = two.mul(currentRadius.pow(two)).sqrt(),
+        // radiusVector: Vertex = Vertex.clone(preNormal).selfMul(currentRadius),
+        radiusVector = new Vertex(preNormal.x, preNormal.y).selfMul(currentRadius),
+        midNormal = preNormal.add(nextNorml).mul(new Decimal(0.5)).normalise(),
+        scaledVertex = vertext.sub(midNormal.mul(diagonalRadius));
+        // radiusVector = radiusVector.mul(currentRadius) as Vertex
+      
+      var precision = quality.add(MathUtil.zero);
+
+      if (quality.eq(MathUtil.negOne)) {
+        precision = currentRadius.pow(new Decimal(0.32)).mul(new Decimal(1.75))
+      }
+
+      precision = Common.clamp(precision, qualityMin, qualityMax)
+
+      if (precision.mod(two).eq(MathUtil.one)) {
+        precision = precision.add(MathUtil.one)
+      }
+
+      let alpha = preNormal.dot(nextNorml).acos(),
+          theta = alpha.div(precision)
+
+      // TODO: 可能存在精度问题
+      for (let j = 0; j < precision.toNumber(); j++) {
+        const jTheta = theta.mul(new Decimal(j));
+        const radiusRotate: Vertex = new Vertex(MathUtil.ZERO, MathUtil.ZERO);
+        radiusVector.rotate(jTheta, radiusRotate)
+        radiusRotate.add(scaledVertex, radiusRotate)
+        newVertices.push(radiusRotate)
+      }
+    }
+
+    return newVertices;
+  }
+
   /**
    * 将输入的顶点 生成新的凸多边形顶点数组
    * @param vertices

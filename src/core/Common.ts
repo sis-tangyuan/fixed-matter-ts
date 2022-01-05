@@ -203,10 +203,10 @@ static isString(obj: any): boolean {
 * @param {number} max
 * @return {number} The value clamped between min and max inclusive
 */
-static clamp = function(value: number, min: number, max: number): number {
-  if (value < min)
+static clamp = function(value: Decimal, min: Decimal, max: Decimal): Decimal {
+  if (value.lt(min))
       return min;
-  if (value > max)
+  if (value.gt(max))
       return max;
   return value;
 };
@@ -360,11 +360,11 @@ static warnOnce(...args: any[]) {
 * @param {string} name The property name of the function on obj
 * @param {string} warning The one-time message to show if the function is called
 */
-static deprecated = function(obj: any, prop: string, warning:string) {
-  obj[prop] = Common.chain(function() {
-      Common.warnOnce('🔅 deprecated 🔅', warning);
-  }, obj[prop]);
-};
+// static deprecated = function(obj: any, prop: string, warning:string) {
+//   obj[prop] = Common.chain(function() {
+//       Common.warnOnce('🔅 deprecated 🔅', warning);
+//   }, obj[prop]);
+// };
 
 /**
 * Returns the next unique sequential ID.
@@ -473,44 +473,44 @@ static _topologicalSort = function(node: string, visited: any, temp: any, graph:
 * @param ...funcs {function} The functions to chain.
 * @return {function} A new function that calls the passed functions in order.
 */
-static chain(...arg: any[]) {
-  var funcs: any[] = [];
+// static chain(...arg: any[]) {
+//   var funcs: any[] = [];
 
-  for (var i = 0; i < arg.length; i += 1) {
-      var func = arg[i];
+//   for (var i = 0; i < arg.length; i += 1) {
+//       var func = arg[i];
 
-      if (func._chained) {
-          // flatten already chained functions
-          funcs.push.apply(funcs, func._chained);
-      } else {
-          funcs.push(func);
-      }
-  }
+//       if (func._chained) {
+//           // flatten already chained functions
+//           funcs.push.apply(funcs, func._chained);
+//       } else {
+//           funcs.push(func);
+//       }
+//   }
 
-  var chain = function(): any {
-      // https://github.com/GoogleChrome/devtools-docs/issues/53#issuecomment-51941358
-      var lastResult,
-          args = new Array(arguments.length);
+//   var chain = function(): any {
+//       // https://github.com/GoogleChrome/devtools-docs/issues/53#issuecomment-51941358
+//       var lastResult,
+//           args = new Array(arguments.length);
 
-      for (var i = 0, l = arguments.length; i < l; i++) {
-          args[i] = arguments[i];
-      }
+//       for (var i = 0, l = arguments.length; i < l; i++) {
+//           args[i] = arguments[i];
+//       }
 
-      for (i = 0; i < funcs.length; i += 1) {
-          var result: any = funcs[i].apply(lastResult, args);
+//       for (i = 0; i < funcs.length; i += 1) {
+//           var result: any = funcs[i].apply(lastResult, args);
 
-          if (typeof result !== 'undefined') {
-              lastResult = result;
-          }
-      }
+//           if (typeof result !== 'undefined') {
+//               lastResult = result;
+//           }
+//       }
 
-      return lastResult;
-  };
+//       return lastResult;
+//   };
 
-  chain._chained = funcs;
+//   chain._chained = funcs;
 
-  return chain;
-};
+//   return chain;
+// };
 
 /**
 * Chains a function to excute before the original function on the given `path` relative to `base`.
@@ -521,12 +521,12 @@ static chain(...arg: any[]) {
 * @param {function} func The function to chain before the original
 * @return {function} The chained function that replaced the original
 */
-static chainPathBefore(base: any, path: string, func: any) {
-  return Common.set(base, path, Common.chain(
-      func,
-      Common.get(base, path)
-  ));
-};
+// static chainPathBefore(base: any, path: string, func: any) {
+//   return Common.set(base, path, Common.chain(
+//       func,
+//       Common.get(base, path)
+//   ));
+// };
 
 /**
 * Chains a function to excute after the original function on the given `path` relative to `base`.
@@ -537,12 +537,12 @@ static chainPathBefore(base: any, path: string, func: any) {
 * @param {function} func The function to chain after the original
 * @return {function} The chained function that replaced the original
 */
-static chainPathAfter = function(base: any, path: string, func: any) {
-  return Common.set(base, path, Common.chain(
-      Common.get(base, path),
-      func
-  ));
-};
+// static chainPathAfter = function(base: any, path: string, func: any) {
+//   return Common.set(base, path, Common.chain(
+//       Common.get(base, path),
+//       func
+//   ));
+// };
 
 /**
 * Provide the [poly-decomp](https://github.com/schteppe/poly-decomp.js) library module to enable
@@ -550,9 +550,9 @@ static chainPathAfter = function(base: any, path: string, func: any) {
 * @method setDecomp
 * @param {} decomp The [poly-decomp](https://github.com/schteppe/poly-decomp.js) library module.
 */
-static setDecomp = function(decomp: any) {
-  Common._decomp = decomp;
-};
+// static setDecomp = function(decomp: any) {
+//   Common._decomp = decomp;
+// };
 
 /**
 * Returns the [poly-decomp](https://github.com/schteppe/poly-decomp.js) library module provided through `Common.setDecomp`,
@@ -560,25 +560,25 @@ static setDecomp = function(decomp: any) {
 * @method getDecomp
 * @return {} The [poly-decomp](https://github.com/schteppe/poly-decomp.js) library module if provided.
 */
-static getDecomp(): any {
-  // get user provided decomp if set
-  var decomp = Common._decomp;
+// static getDecomp(): any {
+//   // get user provided decomp if set
+//   var decomp = Common._decomp;
 
-  try {
-      // otherwise from window global
-      if (!decomp && typeof window !== 'undefined') {
-          decomp = window.decomp;
-      }
+//   try {
+//       // otherwise from window global
+//       if (!decomp && typeof window !== 'undefined') {
+//           decomp = window.decomp;
+//       }
 
-      // otherwise from node global
-      if (!decomp && typeof global !== 'undefined') {
-          decomp = global.decomp;
-      }
-  } catch (e) {
-      // decomp not available
-      decomp = null;
-  }
+//       // otherwise from node global
+//       if (!decomp && typeof global !== 'undefined') {
+//           decomp = global.decomp;
+//       }
+//   } catch (e) {
+//       // decomp not available
+//       decomp = null;
+//   }
 
-  return decomp;
-};
+//   return decomp;
+// };
 }
