@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import { Vector } from "..";
+import BaseBody from "../base/BaseBody";
 import Body from "../body/Body";
 import { Common } from "../core/Common";
 import Sleeping from "../core/Sleeping";
@@ -26,15 +27,15 @@ export interface ConstraintOpt {
 /**
  * 约束
  */
-export default class Constraint implements ConstraintOpt {
+export default class Constraint implements ConstraintOpt, BaseBody {
+    id: number;
+    label: string;
+    type: string;
     bodyA?: Body | undefined;
     pointA: Vector;
     bodyB?: Body | undefined;
     pointB: Vector;
-    id: number;
     length: Decimal;
-    label: string;
-    type: string;
     stiffness: Decimal;
     damping: Decimal;
     angularStiffness: Decimal;

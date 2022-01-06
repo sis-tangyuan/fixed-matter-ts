@@ -8,6 +8,16 @@ const vertices = [
     Vertex.createByXY(40, 40),
     Vertex.createByXY(0, 40),
 ]
+
+test("创建顶点列表", () => {
+    const path = 'L 0 0 L 10 0 L 10 30 L 0 30';
+    const vertices = Vertices.fromPath(path);
+    expect(vertices.length === 4).toBe(true);
+    // for(let i = 0; i < vertices.length; i++) {
+    //     console.log(`顶点: ${vertices[i].toString()}`)
+    // }
+})
+
 test("多边形面积", () => {
 
 

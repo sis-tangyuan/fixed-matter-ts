@@ -1,7 +1,8 @@
 import Decimal from "decimal.js";
-import { Vector, Vertex } from "..";
 import Body, { BodyOriginal, CollisionFilter } from "../body/Body";
 import { Common } from "../core/Common";
+import Vector from "../geometry/Vector";
+import Vertex from "../geometry/Vertex";
 import Vertices from "../geometry/Vertices";
 import MathUtil from "../math/MathUtil";
 

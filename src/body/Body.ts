@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import { Vector } from "..";
+import BaseBody from "../base/BaseBody";
 import { Common } from "../core/Common";
 import { IEvent } from "../core/Events";
 import Sleeping from "../core/Sleeping";
@@ -68,7 +69,7 @@ export class CollisionFilter {
   }
 }
 
-export default class Body implements IEvent {
+export default class Body implements IEvent, BaseBody {
   // 惯性缩放值
   private static _inertiaScale = new Decimal(4);
   private static _nextCollidingGroupId = 1;

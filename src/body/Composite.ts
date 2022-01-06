@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import { Vector } from "..";
+import BaseBody from "../base/BaseBody";
 import Constraint from "../constraint/Constraint";
 import { Common } from "../core/Common";
 import Events, {IEvent} from "../core/Events";
@@ -16,16 +17,16 @@ export interface CompositeOpt {
     label?: string;
 }
 
-export default class Composite implements IEvent {
+export default class Composite implements IEvent, BaseBody {
 
     id: number = Common.nextId();
     type: string = 'composite'
+    label: string = 'Composite';
     parent?: Composite
     isModified: boolean = false;
     bodies: Body[] = []
     constraints: Constraint[] = [];
     composites: Composite[] = [];
-    lable: string = 'Composite';
     plugin = {};
     cache?: CompositeCache | null
 
@@ -56,7 +57,7 @@ export default class Composite implements IEvent {
         }
     }
 
-    add(object: any): Composite {
+    add(object: BaseBody): Composite {
         var objects: any[] = [];
         objects = objects.concat(object);
 
