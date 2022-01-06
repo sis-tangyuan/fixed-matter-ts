@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
-import { Vector } from "..";
 import { Common } from "../core/Common";
+import Vector from "./Vector";
 import Vertex from "./Vertex";
 
 /**

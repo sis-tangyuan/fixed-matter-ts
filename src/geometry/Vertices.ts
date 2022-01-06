@@ -1,8 +1,8 @@
 import Decimal from "decimal.js";
-import { Vector } from "..";
 import Body from "../body/Body";
 import { Common } from "../core/Common";
 import MathUtil from "../math/MathUtil";
+import Vector from "./Vector";
 import Vertex from "./Vertex";
 
 export default class Vertices {
@@ -145,6 +145,7 @@ export default class Vertices {
     var verticesLength = vertices.length,
       translateX = vector.x.mul(scalar),
       translateY = vector.y.mul(scalar),
+      // translate = vector.mul(scalar),
       i;
     for (i = 0; i < verticesLength; i++) {
       vertices[i].x = vertices[i].x.add(translateX);

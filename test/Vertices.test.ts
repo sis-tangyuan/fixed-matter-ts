@@ -1,5 +1,6 @@
 import Decimal from "decimal.js"
-import { Vector, Vertex } from "../src"
+import Vector from "../src/geometry/Vector"
+import Vertex from "../src/geometry/Vertex"
 import Vertices from "../src/geometry/Vertices"
 import MathUtil from "../src/math/MathUtil"
 const vertices = [

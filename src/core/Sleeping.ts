@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
-import { Vector } from "..";
 import Body from "../body/Body";
 import Pair from "../collision/Pair";
+import Vector from "../geometry/Vector";
 import MathUtil from "../math/MathUtil";
 import { Common } from "./Common";
 import Events from "./Events";

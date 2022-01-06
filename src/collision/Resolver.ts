@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
-import { Vector } from "..";
 import Body from "../body/Body";
+import Vector from "../geometry/Vector";
 import Vertices from "../geometry/Vertices";
 import MathUtil from "../math/MathUtil";
 import Collision from "./Collision";

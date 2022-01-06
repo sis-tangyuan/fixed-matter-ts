@@ -1,8 +1,9 @@
 import Decimal from "decimal.js";
-import { Vector, Vertex } from "..";
 import Body from "../body/Body";
 import { Common } from "../core/Common";
 import Axes from "../geometry/Axes";
+import Vector from "../geometry/Vector";
+import Vertex from "../geometry/Vertex";
 import Vertices from "../geometry/Vertices";
 import MathUtil from "../math/MathUtil";
 import Pair from "./Pair";

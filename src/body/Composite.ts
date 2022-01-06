@@ -1,10 +1,10 @@
 import Decimal from "decimal.js";
-import { Vector } from "..";
 import BaseBody from "../base/BaseBody";
 import Constraint from "../constraint/Constraint";
 import { Common } from "../core/Common";
 import Events, {IEvent} from "../core/Events";
 import Bounds from "../geometry/Bounds";
+import Vector from "../geometry/Vector";
 import Body from "./Body";
 
 export interface CompositeCache {

@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
-import { Vector } from "..";
 import { Common } from "../core/Common";
 import MathUtil from "../math/MathUtil";
+import Vector from "./Vector";
 import Vertex from "./Vertex";
 
 export default class Axes {

@@ -1,5 +1,4 @@
 import Decimal from "decimal.js";
-import { Vector } from "..";
 import BaseBody from "../base/BaseBody";
 import { Common } from "../core/Common";
 import { IEvent } from "../core/Events";
@@ -7,6 +6,7 @@ import Sleeping from "../core/Sleeping";
 import { BodiesOpt } from "../factory/Bodies";
 import Axes from "../geometry/Axes";
 import Bounds from "../geometry/Bounds";
+import Vector from "../geometry/Vector";
 import Vertex from "../geometry/Vertex";
 import Vertices from "../geometry/Vertices";
 import MathUtil from "../math/MathUtil";

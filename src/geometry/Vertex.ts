@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
-import { Vector } from "..";
 import Body from "../body/Body";
 import { Common } from "../core/Common";
+import Vector from "./Vector";
 
 /**
  * 定点

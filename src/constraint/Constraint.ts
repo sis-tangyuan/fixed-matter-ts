@@ -1,10 +1,10 @@
 import Decimal from "decimal.js";
-import { Vector } from "..";
 import BaseBody from "../base/BaseBody";
 import Body from "../body/Body";
 import { Common } from "../core/Common";
 import Sleeping from "../core/Sleeping";
 import Axes from "../geometry/Axes";
+import Vector from "../geometry/Vector";
 import Vertices from "../geometry/Vertices";
 import MathUtil from "../math/MathUtil";
 
